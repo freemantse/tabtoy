@@ -57,6 +57,17 @@ type {{$strus.Name}} struct{
 }
 {{end}}
 
+// 添加init初始实例 "Add By Tse"
+var Ins{{$.Name}}Table *{{$.Name}}Table
+func init() {
+	Ins{{$.Name}}Table = New{{$.Name}}Table()
+}
+
+// 添加Reload方法 "Add By Tse"
+func (self *{{$.Name}}Table) Reload() error {
+	return self.Load(self.configfile)
+}
+
 // {{$.Name}} 访问接口
 type {{$.Name}}Table struct{
 	
@@ -78,6 +89,9 @@ type {{$.Name}}Table struct{
 	{{range $a, $strus := .IndexedStructs}} {{range .Indexes}}
 	{{$strus.Name}}By{{.Name}} map[{{.KeyType}}]*{{$strus.TypeName}}
 	{{end}} {{end}}
+
+	// 配置文件
+	configfile string
 }
 
 {{range .VerticalFields}}
@@ -89,7 +103,7 @@ func (self *{{$.Name}}Table) Get{{.Name}}( ) {{.ElementTypeString}} {
 
 // 从json文件加载
 func (self *{{$.Name}}Table) Load(filename string) error {
-
+	self.configfile = filename
 	data, err := ioutil.ReadFile(filename)
 
 	if err != nil {
